@@ -98,7 +98,26 @@ Causal---Embeddings-/
 - Naive difference-in-means: **$16.21** (224% overestimate!)
 - True causal effect: **$5.00**
 
-**Note on Gemini API**: The original plan was to use Google Gemini 2.5 Flash for text generation, but the API returned 403 errors (model may not be available). Instead, we use sophisticated rule-based text generation with multiple templates that still capture ability differences in vocabulary, grammar, and professionalism - which is sufficient for demonstrating the methodology.
+**Text Generation Options**:
+1. **Template-based** (`generate_data_final.py`): Uses sophisticated rule-based templates - FAST, no API needed
+2. **Gemini AI** (`generate_gemini_profiles.py`): Uses Google Gemini API for realistic AI-generated profiles - requires API key
+
+**To use Gemini AI for realistic profiles**:
+```bash
+# 1. Get your FREE API key from:
+https://aistudio.google.com/app/apikey
+
+# 2. Create a .env file:
+echo "GEMINI_API_KEY=your_api_key_here" > .env
+
+# 3. Install dependencies:
+pip install -r requirements.txt
+
+# 4. Run the generator:
+python generate_gemini_profiles.py --n_samples 5000
+```
+
+The Gemini version generates truly realistic profiles with natural language variation based on ability levels. It includes checkpoint support so you can resume if interrupted.
 
 ---
 
