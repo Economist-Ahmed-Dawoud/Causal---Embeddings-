@@ -1,0 +1,112 @@
+{
+  "version": "2.0.0",
+  "n_samples": 5000,
+  "true_causal_effect": 5.0,
+  "checks": {
+    "no_missing_values": true,
+    "no_infinite_values": true,
+    "value_ranges": {
+      "age_range": "True",
+      "experience_range": "True",
+      "experience_logical": "True",
+      "profile_completeness": "True",
+      "num_skills": "True",
+      "portfolio": "True",
+      "certifications": "True",
+      "total_jobs": "True",
+      "success_rate": "True",
+      "response_rate": "True",
+      "market_demand": "True",
+      "propensity": "True",
+      "treatment_binary": "True",
+      "earnings_range": "True",
+      "text_nonempty": "True"
+    },
+    "no_duplicates": "True"
+  },
+  "confounding": {
+    "selection_bias": {
+      "treated_ability_mean": 0.44613862287397676,
+      "control_ability_mean": -0.5148925568520354,
+      "difference": 0.9610311797260122,
+      "t_statistic": 38.74354800832861,
+      "p_value": 2.230260505031988e-287,
+      "significant": "True"
+    },
+    "confounding": {
+      "correlation": 0.8679432315865615,
+      "strong": "True"
+    },
+    "naive_bias": {
+      "naive_estimate": 13.689696838351725,
+      "true_effect": 5.0,
+      "bias": 8.689696838351725,
+      "bias_pct": 173.79393676703452,
+      "substantial": "True"
+    }
+  },
+  "positivity": {
+    "min_propensity": 0.01,
+    "max_propensity": 0.99,
+    "violations": "0",
+    "violation_pct": 0.0,
+    "satisfied": "True"
+  },
+  "balance": [
+    {
+      "variable": "age",
+      "treated_mean": 34.35294546133852,
+      "control_mean": 33.22181285748681,
+      "mean_diff": 1.1311326038517109,
+      "pooled_std": 9.126962880254684,
+      "smd": 0.12393307814353104,
+      "balanced": false
+    },
+    {
+      "variable": "years_experience",
+      "treated_mean": 9.859771156788705,
+      "control_mean": 9.01947935916135,
+      "mean_diff": 0.840291797627355,
+      "pooled_std": 5.772924408235143,
+      "smd": 0.14555738793819456,
+      "balanced": false
+    },
+    {
+      "variable": "profile_completeness",
+      "treated_mean": 57.04319348927545,
+      "control_mean": 41.86375996649935,
+      "mean_diff": 15.179433522776101,
+      "pooled_std": 16.373270304821997,
+      "smd": 0.9270862350758171,
+      "balanced": false
+    },
+    {
+      "variable": "num_skills",
+      "treated_mean": 8.819054652880354,
+      "control_mean": 6.689790575916231,
+      "mean_diff": 2.129264076964123,
+      "pooled_std": 3.1485048495848384,
+      "smd": 0.6762778457352187,
+      "balanced": false
+    },
+    {
+      "variable": "portfolio_items",
+      "treated_mean": 7.508862629246677,
+      "control_mean": 5.869982547993019,
+      "mean_diff": 1.6388800812536575,
+      "pooled_std": 3.245573936405796,
+      "smd": 0.5049584798763147,
+      "balanced": false
+    },
+    {
+      "variable": "ability_score",
+      "treated_mean": 0.44613862287397676,
+      "control_mean": -0.5148925568520354,
+      "mean_diff": 0.9610311797260122,
+      "pooled_std": 0.8740033921946518,
+      "smd": 1.0995737411417026,
+      "balanced": false
+    }
+  ],
+  "all_checks_passed": "True"
+}
