@@ -48,23 +48,31 @@ CATEGORY_DEMAND = {
     'Social Media Management': 0.65, 'Accounting': 0.55
 }
 
-# Enhanced text templates
+# Enhanced text templates with STRONG ability differentiation
+# These templates create clear linguistic signals that embeddings can capture
+
 HIGH_ABILITY_TEMPLATES = [
-    "As an accomplished {category} specialist with {exp:.0f} years of expertise, I deliver transformative solutions that drive measurable ROI for my clients. Based in {city}, Egypt, I leverage cutting-edge methodologies and industry best practices to exceed expectations. My portfolio demonstrates consistent success in {skill_area}, and I pride myself on meticulous attention to detail and strategic problem-solving.",
-    "I am a results-driven {category} professional operating from {city}, bringing {exp:.0f} years of proven track record in delivering high-impact projects. My approach combines technical excellence with client-centric communication, ensuring seamless collaboration and outstanding outcomes. Specializing in {skill_area}, I consistently transform complex challenges into elegant, scalable solutions.",
-    "Distinguished {category} expert with {exp:.0f} years of progressive experience, I specialize in architecting innovative solutions that align with business objectives. Located in {city}, Egypt, my work ethic centers on precision, reliability, and exceeding client expectations. My expertise in {skill_area} has enabled numerous clients to achieve their strategic goals.",
+    "As a distinguished {category} specialist with {exp:.0f} years of expertise, I architect sophisticated solutions delivering quantifiable ROI exceeding client expectations. Based in {city}, Egypt, I synthesize cutting-edge methodologies with strategic foresight, leveraging advanced analytical frameworks and industry best practices. My portfolio exemplifies consistent excellence in {skill_area}, characterized by meticulous attention to detail, innovative problem-solving, and transformative client partnerships.",
+    "Accomplished {category} strategist from {city} with {exp:.0f} years orchestrating high-impact initiatives across diverse sectors. I excel at synthesizing complex requirements into elegant, scalable architectures that drive sustainable growth. My consultative approach integrates technical mastery with executive-level communication, ensuring stakeholder alignment and exceptional deliverables. Specializing in {skill_area}, I consistently exceed benchmarks through rigorous methodology and creative innovation.",
+    "As a premier {category} consultant with {exp:.0f} years of progressive achievement, I deliver transformative solutions that catalyze organizational success. Operating from {city}, my methodology emphasizes empirical analysis, strategic optimization, and measurable outcomes. My expertise in {skill_area} has empowered Fortune-caliber clients to realize their most ambitious objectives through systematic excellence and unwavering commitment to quality.",
+    "Distinguished {category} professional commanding {exp:.0f} years of expertise in delivering enterprise-grade solutions. From {city}, I leverage comprehensive domain knowledge and advanced technical proficiencies to architect innovative systems. My track record demonstrates consistent success in {skill_area}, marked by strategic thinking, exceptional communication, and a relentless pursuit of excellence that transforms challenges into competitive advantages.",
+    "Elite {category} expert with {exp:.0f} years mastering the intersection of technical excellence and business acumen. Based in {city}, Egypt, I specialize in engineering sophisticated solutions that align with strategic imperatives. My proficiency in {skill_area} enables me to deliver comprehensive, scalable outcomes that exceed expectations while maintaining the highest standards of professional integrity and client partnership.",
 ]
 
 MED_ABILITY_TEMPLATES = [
-    "I am a {category} freelancer based in {city}, Egypt with {exp:.0f} years of experience in the field. I provide professional services and work closely with clients to meet project requirements. My skills include {skill_area} and I am committed to delivering quality work on time.",
-    "Professional {category} specialist from {city} offering {exp:.0f} years of hands-on experience. I focus on providing reliable services and maintaining good communication with clients throughout the project lifecycle. I have worked on various projects involving {skill_area}.",
-    "Experienced {category} freelancer located in {city}, Egypt. With {exp:.0f} years in the industry, I offer dependable services in {skill_area}. I value client satisfaction and strive to complete projects efficiently and professionally.",
+    "I am a {category} freelancer based in {city}, Egypt with {exp:.0f} years of experience. I provide professional services and work with clients to meet their project requirements. My skills include {skill_area} and I deliver quality work on time.",
+    "Professional {category} specialist from {city} with {exp:.0f} years of hands-on experience. I focus on reliable service delivery and good client communication throughout the project. I have worked on various projects involving {skill_area}.",
+    "Experienced {category} freelancer in {city}, Egypt. With {exp:.0f} years in this field, I offer dependable services in {skill_area}. I value client satisfaction and complete projects efficiently.",
+    "{category} professional based in {city} with {exp:.0f} years of practical experience. I handle projects in {skill_area} and maintain consistent quality standards. I communicate regularly with clients and meet deadlines.",
+    "Dedicated {category} practitioner from {city}, Egypt. {exp:.0f} years of experience in the industry. I work on {skill_area} projects and ensure timely delivery with professional results.",
 ]
 
 LOW_ABILITY_TEMPLATES = [
-    "hello i am a {category} from {city} with {exp:.0f} years experience. i work hard and deliver projects on time. looking for good opportunities to work with clients. i know {skill_area} and ready to start.",
-    "i am {category} freelancer in {city}, egypt. i have {exp:.0f} years experience and i am very dedicated worker. i can do {skill_area} work and i am available for projects. thanks for reading my profile.",
-    "hardworking {category} based in {city}. {exp:.0f} years doing this work. i am good at {skill_area} and always try my best for clients. please contact me for your projects.",
+    "hello i am {category} from {city} with {exp:.0f} years. i do good work and deliver on time. looking for work opportunities. i know {skill_area}. contact me.",
+    "i am {category} in {city} egypt. {exp:.0f} years experiance. i am hardworking and dedicated. i do {skill_area} stuff. avalable for projects. thanks.",
+    "hi im a {category} based {city}. {exp:.0f} yr experience. can do {skill_area} work. i try hard and finish fast. message me for jobs.",
+    "{category} from {city}. got {exp:.0f} years doing this. i work hard everyday. {skill_area} is what i do. need projects plz contact.",
+    "helo i am {category} freelancer {city} egypt {exp:.0f} years exp. i do {skill_area}. i am reliable worker. looking for good clients to work with. ty.",
 ]
 
 # Skill areas by category
@@ -142,13 +150,19 @@ response_rate = np.clip(50 + ability_score * 12 + np.random.normal(0, 15, N_SAMP
 market_demand_score = np.array([CATEGORY_DEMAND[cat] + np.random.normal(0, 0.1) for cat in category])
 market_demand_score = np.clip(market_demand_score, 0, 1)
 
-# 5. TREATMENT - Strong selection bias
+# 5. TREATMENT - Strong selection bias with PURE U → D confounding
+# Key design choices:
+#   - Ability coefficient (2.0) dominates the propensity score
+#   - Experience is scaled by /10 to prevent it from dominating
+#   - Removed profile_completeness term (it's a collider, not a confounder)
+#   - Reduced noise variance for cleaner confounding signal
 treatment_propensity = expit(
-    1.5 * ability_score +
-    0.5 * years_experience +
-    0.3 * (profile_completeness - 75) / 25 +
-    np.random.normal(0, 0.5, N_SAMPLES)
+    2.0 * ability_score +                    # STRONG: Latent ability drives treatment selection
+    0.3 * (years_experience / 10) +          # WEAK: Scaled experience effect (prevents domination)
+    np.random.normal(0, 0.3, N_SAMPLES)      # REDUCED noise for cleaner signal
 )
+# Ensure positivity assumption holds (no perfect prediction)
+treatment_propensity = np.clip(treatment_propensity, 0.05, 0.95)
 program_participation = (np.random.uniform(0, 1, N_SAMPLES) < treatment_propensity).astype(int)
 
 # 6. OUTCOME - TRUE EFFECT = $5.00
